@@ -13,7 +13,7 @@ TBD
 
 ## How to test
 
-TB
+TBD
 
 ## External hardware
 
