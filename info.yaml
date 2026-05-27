@@ -1,6 +1,6 @@
 # Tiny Tapeout project information
 project:
-  title:        ""ASIC Onboarding Project - Arun Mohabeer"      # Project title
+  title:        "ASIC Onboarding Project - Arun Mohabeer"      # Project title
   author:       "Arun Mohabeer"      # Your name
   discord:      "Diddy 67"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "SPI-controlled PWM peripheral for Tiny Tapeout."      # One line description of what your project does
@@ -25,7 +25,7 @@ project:
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
 pinout:
   # Inputs
-  ui[0]: "SLCK"
+  ui[0]: "SCLK"
   ui[1]: "COPI"
   ui[2]: "nCS"
   ui[3]: ""
