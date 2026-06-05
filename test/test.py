@@ -3,7 +3,7 @@
 
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge
+from cocotb.triggers import RisingEdge, FallingEdge
 from cocotb.triggers import ClockCycles
 from cocotb.types import Logic
 from cocotb.types import LogicArray
@@ -13,7 +13,7 @@ async def await_half_sclk(dut):
     start_time = cocotb.utils.get_sim_time(units="ns")
     while True:
         await ClockCycles(dut.clk, 1)
-        # Wait for half of the SCLK period (10 us)
+        # Wait for half of the SCLK period (10 us)  
         if (start_time + 100*100*0.5) < cocotb.utils.get_sim_time(units="ns"):
             break
     return
@@ -151,11 +151,64 @@ async def test_spi(dut):
 
 @cocotb.test()
 async def test_pwm_freq(dut):
-    # Write your test here
-    dut._log.info("PWM Frequency test completed successfully")
+
+    clock = Clock(dut.clk, 100, units="ns")
+    cocotb.start_soon(clock.start())
+
+    dut.ena.value = 1
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 5)
+
+    await send_spi_transaction(dut, 1, 0x00, 0x01)  # enable output 0
+    await send_spi_transaction(dut, 1, 0x02, 0x01)  # enable PWM on output 0
+    await send_spi_transaction(dut, 1, 0x04, 0x80)  # ~50%
+
+    await RisingEdge(dut.uo_out[0])
+    t1 = cocotb.utils.get_sim_time(units="ns")
+
+    await RisingEdge(dut.uo_out[0])
+    t2 = cocotb.utils.get_sim_time(units="ns")
+
+    period = t2 - t1
+    freq = 1e9 / period
+
+    assert 2970 <= freq <= 3030
+
+    dut._log.info(f"Frequency = {freq} Hz")
 
 
 @cocotb.test()
 async def test_pwm_duty(dut):
-    # Write your test here
-    dut._log.info("PWM Duty Cycle test completed successfully")
+
+    clock = Clock(dut.clk, 100, units="ns")
+    cocotb.start_soon(clock.start())
+
+    dut.ena.value = 1
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 5)
+
+    await send_spi_transaction(dut, 1, 0x00, 0x01)
+    await send_spi_transaction(dut, 1, 0x02, 0x01)
+    await send_spi_transaction(dut, 1, 0x04, 0x80)
+
+    await RisingEdge(dut.uo_out[0])
+    t_rise = cocotb.utils.get_sim_time(units="ns")
+
+    await FallingEdge(dut.uo_out[0])
+    t_fall = cocotb.utils.get_sim_time(units="ns")
+
+    await RisingEdge(dut.uo_out[0])
+    t_next = cocotb.utils.get_sim_time(units="ns")
+
+    high_time = t_fall - t_rise
+    period = t_next - t_rise
+
+    duty = high_time / period
+
+    assert 0.49 <= duty <= 0.51
+
+    dut._log.info(f"Duty cycle = {duty*100:.2f}%")
