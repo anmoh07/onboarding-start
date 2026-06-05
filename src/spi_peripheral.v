@@ -28,21 +28,25 @@ always @(posedge clk)
 begin
 	if (!rst_n)
 	begin
+    
 		sclk_1 <= 1'b0;
 		sclk_2 <= 1'b0;
 		ncs_1 <= 1'b0;
 		ncs_2 <= 1'b0;
 		copi_1 <= 1'b0;
-    		copi_2 <= 1'b0;
+    	copi_2 <= 1'b0;
+
 	end
 	else
 	begin
+
 		sclk_1 <= sclk;
 		sclk_2 <= sclk_1;
 		ncs_1 <= ncs;
 		ncs_2 <= ncs_1;
 		copi_1 <= copi;
-    		copi_2 <= copi_1;
+    	copi_2 <= copi_1;
+    
 	end
 end
 
@@ -99,7 +103,7 @@ begin
 	if (!rst_n) //reset behaviour
 	begin
 
-		en_reg_out_7_0  <= 8'h00;
+		    en_reg_out_7_0  <= 8'h00;
     		en_reg_out_15_8 <= 8'h00;
     		en_reg_pwm_7_0  <= 8'h00;
     		en_reg_pwm_15_8 <= 8'h00;
@@ -112,11 +116,12 @@ begin
     		case (address)
 
         	7'h00: en_reg_out_7_0 <= data;
-		7'h01: en_reg_out_15_8 <= data;
+		    7'h01: en_reg_out_15_8 <= data;
         	7'h02: en_reg_pwm_7_0 <= data;
         	7'h03: en_reg_pwm_15_8 <= data;
-            	7'h04: pwm_duty_cycle <= data;
-		default: /*nothing*/;
+            7'h04: pwm_duty_cycle <= data;
+
+		    default: /*nothing*/;
             
 
     		endcase
